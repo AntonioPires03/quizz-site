@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Missão Guardiões da Saúde: Mito ou Verdade?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#fff5fa; --surface:#ffffff; --ink:#2b1a24; --muted:#6e5663;
+  --pink:#e0489a; --pink-soft:#fde1ef; --line:#f3c3dc;
+  --ok:#1f7a4d; --ok-bg:#e0f5ea; --no:#b3261e; --no-bg:#fde7e5;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1c1219; --surface:#2a1b25; --ink:#fbeaf3; --muted:#c9a9ba;
+    --pink:#ff7ab9; --pink-soft:#46233a; --line:#5a3049;
+    --ok:#6fdca1; --ok-bg:#163a29; --no:#ff9a92; --no-bg:#43201d;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1c1219; --surface:#2a1b25; --ink:#fbeaf3; --muted:#c9a9ba;
+  --pink:#ff7ab9; --pink-soft:#46233a; --line:#5a3049;
+  --ok:#6fdca1; --ok-bg:#163a29; --no:#ff9a92; --no-bg:#43201d;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:"Roboto",system-ui,sans-serif;font-size:17px;line-height:1.5}
+main{max-width:560px;margin:0 auto;padding:20px 18px 40px}
+h1,h2,h3{font-family:"Bree Serif",Georgia,serif;font-weight:400;line-height:1.15;margin:0}
+h1{font-size:2rem;color:var(--pink)}
+h3{font-size:1.25rem;margin:22px 0 8px}
+.sub{color:var(--muted);margin:6px 0 22px}
+.bar{height:8px;background:var(--pink-soft);border-radius:99px;overflow:hidden;margin-bottom:8px}
+.bar i{display:block;height:100%;width:0;background:var(--pink);transition:width .3s}
+.count{font-size:.9rem;color:var(--muted);margin-bottom:18px}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:22px 20px}
+.card h2{font-size:1.45rem}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+button{font:inherit;font-weight:700;border:2px solid var(--pink);background:var(--surface);color:var(--ink);border-radius:14px;padding:16px 10px;cursor:pointer;min-height:56px}
+button:hover:not(:disabled){background:var(--pink-soft)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--pink);outline-offset:3px}
+button:disabled{cursor:default}
+button.right{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+button.wrong{background:var(--no-bg);border-color:var(--no);color:var(--no)}
+.fb{margin-top:18px;padding:14px 16px;border-radius:12px;background:var(--pink-soft)}
+.fb strong{display:block;margin-bottom:2px}
+.next{width:100%;margin-top:16px;background:var(--pink);color:#fff;border-color:var(--pink)}
+.next:hover:not(:disabled){background:var(--pink);filter:brightness(1.08)}
+input{width:100%;font:inherit;padding:14px;margin-top:16px;border:2px solid var(--line);border-radius:14px;background:var(--bg);color:var(--ink)}
+.score{font-family:"Bree Serif",Georgia,serif;font-size:3rem;color:var(--pink);margin:6px 0}
+.help{margin:12px 0 0;padding:0;list-style:none}
+.help li{padding:10px 0;border-top:1px solid var(--line)}
+.help li:first-child{border-top:0}
+.rank{margin:0;padding:0;list-style:none}
+.rank li{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;margin-bottom:6px;background:var(--pink-soft)}
+.rank li.me{outline:2px solid var(--pink)}
+.rank .pos{font-family:"Bree Serif",Georgia,serif;width:2rem;color:var(--pink)}
+.rank .nm{flex:1;overflow-wrap:anywhere}
+.rank .pt{font-weight:700}
+.note{font-size:.88rem;color:var(--muted);margin:6px 0 0}
+.sign{margin-top:24px;color:var(--muted);font-size:.92rem}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion: reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Missão Guardiões da Saúde</h1>
+  <p class="sub">Câncer de mama: mito ou verdade?</p>
+
+  <section id="start">
+    <div class="card">
+      <h2>Quem vai jogar?</h2>
+      <p>Responda 8 perguntas e entre no ranking de quem mais acerta.</p>
+      <input id="name" type="text" maxlength="20" placeholder="Digite seu nome" autocomplete="nickname" aria-label="Seu nome">
+      <button class="next" id="go" type="button">Começar</button>
+      <button id="seeRank" type="button" style="width:100%;margin-top:12px">Ver ranking da turma</button>
+    </div>
+  </section>
+
+  <section id="quiz" hidden>
+    <div class="bar"><i id="fill"></i></div>
+    <div class="count" id="count"></div>
+    <div class="card">
+      <h2 id="q"></h2>
+      <div class="btns">
+        <button id="bV" type="button">Verdade</button>
+        <button id="bM" type="button">Mito</button>
+      </div>
+      <div class="fb" id="fb" hidden></div>
+      <button class="next" id="next" type="button" hidden>Próxima</button>
+    </div>
+  </section>
+
+  <section id="end" hidden>
+    <div class="card">
+      <h2>Missão cumprida!</h2>
+      <div class="score" id="score"></div>
+      <p id="msg"></p>
+
+      <h3>Ranking dos Guardiões</h3>
+      <ol class="rank" id="rank"></ol>
+      <p class="note" id="rnote"></p>
+
+      <h3>Onde buscar ajuda</h3>
+      <p><strong>Informação salva vidas.</strong> Se notar qualquer mudança na mama (em mulheres ou em homens), procure atendimento:</p>
+      <ul class="help">
+        <li>Unidade Básica de Saúde (UBS) do seu bairro</li>
+        <li>Central de Atendimento do SUS: ligue 136</li>
+        <li>ONGs e centros de apoio locais ao combate ao câncer</li>
+      </ul>
+      <button class="next" id="again" type="button">Jogar de novo</button>
+    </div>
+    <p class="sign">Este quiz é educativo e não substitui consulta médica.</p>
+  </section>
+
+  <section id="rankView" hidden>
+    <div class="card">
+      <h2>Ranking da turma</h2>
+      <ol class="rank" id="rank2" style="margin-top:16px"></ol>
+      <p class="note" id="rnote2"></p>
+      <button class="next" id="refresh" type="button">Atualizar</button>
+      <button id="backStart" type="button" style="width:100%;margin-top:12px">Voltar</button>
+    </div>
+  </section>
+
+  <p class="sign">Feito por Antonio, Luan, Leo e Wesley</p>
+</main>
+
+<script type="module">
+/* ====== CONFIGURAÇÃO DO RANKING (Firebase) ======
+   Cole aqui o firebaseConfig do seu projeto. Enquanto estiver com
+   "COLE_AQUI", o ranking funciona só neste aparelho. */
+const FIREBASE_CONFIG = {
+  apiKey: "COLE_AQUI",
+  authDomain: "COLE_AQUI",
+  projectId: "COLE_AQUI",
+  appId: "COLE_AQUI"
+};
+const ONLINE = FIREBASE_CONFIG.apiKey !== "COLE_AQUI";
+
+const Q = [
+  {t:"Só mulheres podem ter câncer de mama.", a:false, e:"Homens também podem ter. A cada 100 casos, cerca de 1 é de um homem, e muitos só descobrem tarde por falta de informação."},
+  {t:"Todo caroço na mama é câncer.", a:false, e:"Muitos caroços são benignos, mas só um médico consegue confirmar. Por isso, qualquer caroço merece avaliação."},
+  {t:"Um caroço fixo e que não dói é um sinal de alerta.", a:true, e:"Isso mesmo. Como não dói, muita gente ignora. Procure atendimento mesmo sem dor."},
+  {t:"Pele da mama com aspecto de casca de laranja é um sinal de alerta.", a:true, e:"Casca de laranja, vermelhidão e inchaço na pele da mama merecem avaliação médica."},
+  {t:"Só quem tem histórico de câncer de mama na família pode ter a doença.", a:false, e:"Ter histórico aumenta o risco, mas muitos casos aparecem em pessoas sem nenhum caso na família."},
+  {t:"Quanto antes o câncer de mama é descoberto, maiores as chances de cura.", a:true, e:"O diagnóstico precoce é a nossa melhor arma. Descobrir cedo muda tudo."},
+  {t:"O SUS oferece diagnóstico e tratamento para o câncer de mama de graça.", a:true, e:"Procure a UBS do seu bairro ou ligue 136 para saber como ser atendido."},
+  {t:"Câncer de mama em homem é tão raro que não precisa de atenção.", a:false, e:"É raro, mas costuma ser descoberto tarde, e isso aumenta o risco. Sentiu um caroço no peito? Procure atendimento."}
+];
+const $ = id => document.getElementById(id);
+let i = 0, pts = 0, done = false, player = "";
+let fb = null; // { db, fs }
+
+async function initFirebase(){
+  if (!ONLINE || fb) return fb;
+  try {
+    const A = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+    const F = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+    fb = { db: F.getFirestore(A.initializeApp(FIREBASE_CONFIG)), fs: F };
+  } catch (e) { fb = null; }
+  return fb;
+}
+
+/* guarda a pontuação e devolve a lista [{name, score, t}] */
+async function saveAndLoad(name, score){
+  const now = Date.now();
+  const f = await initFirebase();
+  if (f) {
+    try {
+      const { collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } = f.fs;
+      const col = collection(f.db, "ranking");
+      await addDoc(col, { name, score, createdAt: serverTimestamp() });
+      const snap = await getDocs(query(col, orderBy("score", "desc"), limit(100)));
+      const list = snap.docs.map(d => {
+        const x = d.data();
+        return { name: x.name, score: x.score, t: x.createdAt ? x.createdAt.toMillis() : now };
+      });
+      return { list, online: true };
+    } catch (e) { /* cai para o ranking local */ }
+  }
+  let list = [];
+  try { list = JSON.parse(localStorage.getItem("gs_rank") || "[]"); } catch (e) { list = []; }
+  list.push({ name, score, t: now });
+  try { localStorage.setItem("gs_rank", JSON.stringify(list.slice(-100))); } catch (e) {}
+  return { list, online: false };
+}
+
+function best(list){
+  const m = new Map();
+  for (const r of list) {
+    const k = r.name.trim().toLowerCase();
+    const o = m.get(k);
+    if (!o || r.score > o.score || (r.score === o.score && r.t < o.t)) m.set(k, r);
+  }
+  return [...m.values()].sort((a, b) => b.score - a.score || a.t - b.t);
+}
+
+function drawRank(list, online, olId = "rank", noteId = "rnote"){
+  const ol = $(olId);
+  ol.innerHTML = "";
+  const top = best(list).slice(0, 30);
+  top.forEach((r, n) => {
+    const li = document.createElement("li");
+    if (r.name.trim().toLowerCase() === player.toLowerCase()) li.className = "me";
+    const p = document.createElement("span"); p.className = "pos"; p.textContent = (n+1) + "º";
+    const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = r.name;
+    const pt = document.createElement("span"); pt.className = "pt"; pt.textContent = r.score + "/" + Q.length;
+    li.append(p, nm, pt);
+    ol.append(li);
+  });
+  $(noteId).textContent = online ? "" : "Ranking salvo só neste aparelho.";
+}
+
+async function loadOnly(){
+  const f = await initFirebase();
+  if (f) {
+    try {
+      const { collection, query, orderBy, limit, getDocs } = f.fs;
+      const snap = await getDocs(query(collection(f.db, "ranking"), orderBy("score", "desc"), limit(100)));
+      return { list: snap.docs.map(d => { const x = d.data(); return { name: x.name, score: x.score, t: x.createdAt ? x.createdAt.toMillis() : 0 }; }), online: true };
+    } catch (e) { /* cai para o local */ }
+  }
+  let list = [];
+  try { list = JSON.parse(localStorage.getItem("gs_rank") || "[]"); } catch (e) { list = []; }
+  return { list, online: false };
+}
+async function openRank(){
+  for (const id of ["start", "quiz", "end"]) $(id).hidden = true;
+  $("rankView").hidden = false;
+  $("rank2").innerHTML = "";
+  $("rnote2").textContent = "Carregando...";
+  const r = await loadOnly();
+  drawRank(r.list, r.online, "rank2", "rnote2");
+  if (!r.list.length) $("rnote2").textContent = "Ninguém jogou ainda.";
+}
+
+function show(){
+  const q = Q[i];
+  done = false;
+  $("q").textContent = q.t;
+  $("count").textContent = "Pergunta " + (i+1) + " de " + Q.length;
+  $("fill").style.width = (i/Q.length*100) + "%";
+  $("fb").hidden = true;
+  $("next").hidden = true;
+  for (const b of [$("bV"), $("bM")]) { b.disabled = false; b.className = ""; }
+}
+function answer(v){
+  if (done) return;
+  done = true;
+  const q = Q[i], ok = v === q.a;
+  if (ok) pts++;
+  $("bV").disabled = $("bM").disabled = true;
+  const mine = v ? $("bV") : $("bM"), good = q.a ? $("bV") : $("bM");
+  good.classList.add("right");
+  if (!ok) mine.classList.add("wrong");
+  const f = $("fb");
+  f.innerHTML = "";
+  const s = document.createElement("strong");
+  s.textContent = (ok ? "Acertou! " : "Quase! ") + "Isso é " + (q.a ? "verdade." : "mito.");
+  f.append(s, q.e);
+  f.hidden = false;
+  $("next").textContent = i === Q.length-1 ? "Ver resultado" : "Próxima";
+  $("next").hidden = false;
+}
+async function finish(){
+  $("quiz").hidden = true;
+  $("end").hidden = false;
+  $("score").textContent = pts + " de " + Q.length;
+  $("msg").textContent = pts >= 6
+    ? "Mandou muito bem, " + player + "! Agora compartilhe com quem você gosta."
+    : "Você já aprendeu bastante, " + player + "! Jogue de novo e compartilhe com a sua família.";
+  $("rank").innerHTML = "";
+  $("rnote").textContent = "Salvando sua pontuação...";
+  const r = await saveAndLoad(player, pts);
+  drawRank(r.list, r.online);
+}
+function begin(){
+  const n = $("name").value.trim();
+  if (!n) { $("name").focus(); return; }
+  player = n; i = 0; pts = 0;
+  $("start").hidden = true; $("end").hidden = true; $("quiz").hidden = false;
+  show();
+}
+$("go").onclick = begin;
+$("seeRank").onclick = openRank;
+$("refresh").onclick = openRank;
+$("backStart").onclick = () => { $("rankView").hidden = true; $("start").hidden = false; };
+if (location.hash === "#ranking") openRank();
+$("name").addEventListener("keydown", e => { if (e.key === "Enter") begin(); });
+$("bV").onclick = () => answer(true);
+$("bM").onclick = () => answer(false);
+$("next").onclick = () => { if (i === Q.length-1) finish(); else { i++; show(); } };
+$("again").onclick = () => { $("end").hidden = true; $("start").hidden = false; $("name").value = player; $("name").focus(); };
+</script>
+</body>
+</html>
